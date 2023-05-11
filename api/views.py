@@ -1,8 +1,23 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.core.exceptions import ImproperlyConfigured
 import openai
 
-openai.api_key = "SECRET_KEY"
+import os ,json
+
+secret_file = os.path.join('/home','oh','sweetbot','gpt_romance','secrets.json')
+
+with open(secret_file) as f:
+    secrets = json.loads(f.read())
+    
+def get_secret(setting,secrets=secrets):
+    try:
+        return secrets[setting]
+    except KeyError:
+        error_msg = f"{setting}"
+        raise ImproperlyConfigured(error_msg)
+
+openai.api_key = get_secret("SECRET_KEY")
 
 
 def generate_text(request):
